@@ -1,4 +1,4 @@
-package com.jdev.TodoApplication.DTOs.RequestDTOs;
+package com.jdev.TodoApplication.DTOs;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

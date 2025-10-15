@@ -1,7 +1,6 @@
 package com.jdev.TodoApplication.Controllers;
 
-import com.jdev.TodoApplication.DTOs.RequestDTOs.TodoRequest;
-import com.jdev.TodoApplication.DTOs.ResponseDTOs.TodoResponse;
+import com.jdev.TodoApplication.DTOs.TodoRequest;
 import com.jdev.TodoApplication.Models.Todo;
 import com.jdev.TodoApplication.Services.TodoServices;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -12,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,8 +34,8 @@ public class TodoController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201" , description = "Todo Created Successfully")
     })
-    public ResponseEntity<Todo> createTodo(HttpServletRequest request, @Valid @RequestBody TodoRequest todoRequest){
-        return new ResponseEntity<>(todoServices.createTodo(request, todoRequest), HttpStatus.CREATED);
+    public ResponseEntity<Todo> createTodo(@Valid @RequestBody TodoRequest todoRequest){
+        return new ResponseEntity<>(todoServices.createTodo(todoRequest), HttpStatus.CREATED);
     }
 
 
@@ -42,7 +43,12 @@ public class TodoController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "All Todos Retrieved Successfully")
     })
-    public ResponseEntity<List<TodoResponse>> getAllTodos(){
+    public ResponseEntity<List<Todo>> getAllTodos(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String role = auth.getAuthorities().iterator().next().getAuthority();
+        if(role.equals("ADMIN")){
+            return new ResponseEntity<>(todoServices.findAllTodos(), HttpStatus.OK);
+        }
         return new ResponseEntity<>(todoServices.getAllTodos(),HttpStatus.OK);
     }
 

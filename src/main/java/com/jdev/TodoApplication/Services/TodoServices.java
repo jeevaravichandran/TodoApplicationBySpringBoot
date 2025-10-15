@@ -1,7 +1,6 @@
 package com.jdev.TodoApplication.Services;
 
-import com.jdev.TodoApplication.DTOs.RequestDTOs.TodoRequest;
-import com.jdev.TodoApplication.DTOs.ResponseDTOs.TodoResponse;
+import com.jdev.TodoApplication.DTOs.TodoRequest;
 import com.jdev.TodoApplication.Models.Todo;
 import com.jdev.TodoApplication.Repostories.TodoRepo;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,9 +10,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class TodoServices {
@@ -27,7 +24,7 @@ public class TodoServices {
     @Autowired
     private ModelMapper modelMapper;
 
-    public Todo createTodo(HttpServletRequest request, TodoRequest todoRequest){
+    public Todo createTodo(TodoRequest todoRequest){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Todo todo = new Todo();
         todo.setName(todoRequest.getName());
@@ -37,18 +34,21 @@ public class TodoServices {
     }
 
 
-    public List<TodoResponse> getAllTodos(){
+    public List<Todo> getAllTodos(){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        List<Todo> todoList = todoRepo.findByUsername(username);
-         List<TodoResponse> todoResponseList = todoList.stream()
-                .map(todo -> modelMapper.map(todo,TodoResponse.class))
-                .collect(Collectors.toList());
-         return todoResponseList;
+        return todoRepo.findByUsername(username);
     }
 
-    public Todo updateTodo(Todo todo){
+    public List<Todo> findAllTodos() {
+        return todoRepo.findAll();
+    }
+
+
+    public Todo updateTodo(Todo todo) throws RuntimeException{
         String requestUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        if(todo.getUsername().equals(requestUsername)){
+        Todo existTodo = getTodoById(todo.getId());
+        if(existTodo.getUsername().equals(requestUsername)){
+            todo.setUsername(requestUsername);
             return todoRepo.save(todo);
         }
         else{
@@ -73,7 +73,13 @@ public class TodoServices {
        } catch (Exception exception){
            throw new EmptyResultDataAccessException(0);
        }
+    }
 
+    public void deleteTodoByUsername(String username){
+        List<Todo> todoList = todoRepo.findByUsername(username);
+        for(Todo todo : todoList){
+            todoRepo.deleteById(todo.getId());
+        }
     }
 
 }

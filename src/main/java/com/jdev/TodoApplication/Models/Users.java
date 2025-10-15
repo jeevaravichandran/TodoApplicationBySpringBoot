@@ -1,5 +1,7 @@
 package com.jdev.TodoApplication.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -14,5 +16,9 @@ public class Users {
     @GeneratedValue
     private Integer id;
     private String username;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
+    private String name;
+    private String email;
+    private String role;
 }
