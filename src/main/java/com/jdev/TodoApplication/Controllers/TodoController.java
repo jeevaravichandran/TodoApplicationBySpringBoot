@@ -1,6 +1,7 @@
 package com.jdev.TodoApplication.Controllers;
 
 import com.jdev.TodoApplication.DTOs.TodoRequest;
+import com.jdev.TodoApplication.DTOs.UpdateTodoRequest;
 import com.jdev.TodoApplication.Models.Todo;
 import com.jdev.TodoApplication.Services.TodoServices;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -57,9 +58,9 @@ public class TodoController {
             @ApiResponse(responseCode = "202" , description = "Todo Updated Successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid Todo")
     })
-    public ResponseEntity<Todo> updateTodo(@RequestBody Todo todo){
+    public ResponseEntity<Todo> updateTodo(@Valid @RequestBody UpdateTodoRequest updateTodoRequest){
         try {
-            Todo updatedTodo = todoServices.updateTodo(todo);
+            Todo updatedTodo = todoServices.updateTodo(updateTodoRequest);
             return new ResponseEntity<>(updatedTodo, HttpStatus.ACCEPTED);
         } catch (RuntimeException exception){
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);

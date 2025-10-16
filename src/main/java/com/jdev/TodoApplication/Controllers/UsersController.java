@@ -1,8 +1,6 @@
 package com.jdev.TodoApplication.Controllers;
 
-import com.jdev.TodoApplication.DTOs.UpdatePasswordRequest;
-import com.jdev.TodoApplication.DTOs.UpdateUserRequest;
-import com.jdev.TodoApplication.DTOs.UserRequest;
+import com.jdev.TodoApplication.DTOs.*;
 import com.jdev.TodoApplication.Models.Users;
 import com.jdev.TodoApplication.Services.UsersServices;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -42,8 +40,8 @@ public class UsersController {
             @ApiResponse(responseCode = "200" , description = "Login Successfully"),
             @ApiResponse(responseCode = "401", description = "Invalid Username/password, Please Check your Credentials")
     })
-    public ResponseEntity<String> loginUser(@RequestBody Users user){
-        return new ResponseEntity<>(usersServices.verifyUser(user),HttpStatus.OK);
+    public ResponseEntity<String> loginUser(@Valid @RequestBody LoginUserRequest loginUserRequest){
+        return new ResponseEntity<>(usersServices.verifyUser(loginUserRequest),HttpStatus.OK);
     }
 
     @GetMapping("/get")
@@ -112,11 +110,11 @@ public class UsersController {
             @ApiResponse(responseCode = "202", description = "Account Deleted Successfully"),
             @ApiResponse(responseCode = "401", description = "Wrong Password, Cannot delete the Account")
     })
-    public ResponseEntity<String> deleteAccount(@RequestBody Users users){
-        boolean isDeleted = usersServices.deleteAccount(users.getPassword());
-        if(isDeleted){
+    public ResponseEntity<String> deleteAccount(@Valid @RequestBody DeleteUserRequest deleteUserRequest){
+        try{
+            usersServices.deleteAccount(deleteUserRequest.getPassword());
             return new ResponseEntity<>("Account Deleted Successfully", HttpStatus.ACCEPTED);
-        } else{
+        } catch (RuntimeException exception){
             return new ResponseEntity<>("Wrong password, Cannot delete the Account", HttpStatus.UNAUTHORIZED);
         }
     }

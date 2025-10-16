@@ -1,5 +1,6 @@
 package com.jdev.TodoApplication.Services;
 
+import com.jdev.TodoApplication.DTOs.LoginUserRequest;
 import com.jdev.TodoApplication.DTOs.UpdateUserRequest;
 import com.jdev.TodoApplication.DTOs.UserRequest;
 import com.jdev.TodoApplication.Models.Users;
@@ -48,11 +49,12 @@ public class UsersServices {
         return usersRepo.save(user);
     }
 
-    public String verifyUser(Users user) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(),user.getPassword()));
+    public String verifyUser(LoginUserRequest loginUserRequest) {
+        Authentication authentication = authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(loginUserRequest.getUsername(),loginUserRequest.getPassword()));
 
         if(authentication.isAuthenticated()){
-            return jwtServices.generateToken(user.getUsername()) ;
+            return jwtServices.generateToken(loginUserRequest.getUsername()) ;
         }
         return "Invalid Account ! Please Create an account before login!!!";
     }
@@ -91,15 +93,16 @@ public class UsersServices {
     }
 
     @Transactional
-    public boolean deleteAccount(String password) {
+    public void deleteAccount(String password) throws RuntimeException {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Users user = usersRepo.findByUsername(username);
         if(encoder.matches(password, user.getPassword())){
             todoServices.deleteTodoByUsername(username);
             usersRepo.deleteById(user.getId());
-            return true;
         }
-        return false;
+        else{
+            throw new RuntimeException("Invalid Password");
+        }
     }
 
     public Users updateUser(@Valid UpdateUserRequest request) {

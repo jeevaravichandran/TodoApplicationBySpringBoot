@@ -1,6 +1,8 @@
 package com.jdev.TodoApplication.Services;
 
 import com.jdev.TodoApplication.DTOs.TodoRequest;
+import com.jdev.TodoApplication.DTOs.UpdatePasswordRequest;
+import com.jdev.TodoApplication.DTOs.UpdateTodoRequest;
 import com.jdev.TodoApplication.Models.Todo;
 import com.jdev.TodoApplication.Repostories.TodoRepo;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,9 +22,6 @@ public class TodoServices {
 
     @Autowired
     private JWTServices jwtServices;
-
-    @Autowired
-    private ModelMapper modelMapper;
 
     public Todo createTodo(TodoRequest todoRequest){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -44,12 +43,13 @@ public class TodoServices {
     }
 
 
-    public Todo updateTodo(Todo todo) throws RuntimeException{
+    public Todo updateTodo(UpdateTodoRequest updateTodoRequest) throws RuntimeException{
         String requestUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        Todo existTodo = getTodoById(todo.getId());
+        Todo existTodo = getTodoById(updateTodoRequest.getId());
         if(existTodo.getUsername().equals(requestUsername)){
-            todo.setUsername(requestUsername);
-            return todoRepo.save(todo);
+            existTodo.setName(updateTodoRequest.getName());
+            existTodo.setCompleted(updateTodoRequest.getCompleted());
+            return todoRepo.save(existTodo);
         }
         else{
             throw new RuntimeException("Invalid Todo Id , Please Check the Id");
