@@ -1,12 +1,9 @@
 package com.jdev.TodoApplication.Services;
 
 import com.jdev.TodoApplication.DTOs.TodoRequest;
-import com.jdev.TodoApplication.DTOs.UpdatePasswordRequest;
 import com.jdev.TodoApplication.DTOs.UpdateTodoRequest;
 import com.jdev.TodoApplication.Models.Todo;
 import com.jdev.TodoApplication.Repostories.TodoRepo;
-import jakarta.servlet.http.HttpServletRequest;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.context.SecurityContextHolder;

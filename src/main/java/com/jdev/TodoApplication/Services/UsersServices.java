@@ -6,7 +6,6 @@ import com.jdev.TodoApplication.DTOs.UserRequest;
 import com.jdev.TodoApplication.Models.Users;
 import com.jdev.TodoApplication.Repostories.UsersRepo;
 import jakarta.validation.Valid;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
