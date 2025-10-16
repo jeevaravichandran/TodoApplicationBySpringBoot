@@ -118,6 +118,22 @@ Example:
 
 Authorization: Bearer <your_token_here>
 
+⚙️ Creating an Admin User
+
+By default, all registered users are created with the ROLE_USER role.
+If you want to access Admin-only endpoints, you must manually create admin role in your database.
+
+Example SQL (adjust table/column names if needed):
+
+INSERT INTO users VALUES("id", "name", "email", "username", "password", "role");
+these inserted value is based on the table column please kindly refer it in your table and create a admin
+
+Once this is done, you can use that account to access all Admin routes such as:
+
+GET /users/get
+
+DELETE /users/delete/{id}
+
 
 🧩 Project Structure
 src/
