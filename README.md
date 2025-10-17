@@ -139,10 +139,13 @@ DELETE /users/delete/{id}
 src/
  ├─ main/
  │   ├─ java/com/example/todo/
- │   │   ├─ controller/   → Handles API endpoints
- │   │   ├─ service/      → Contains business logic
- │   │   ├─ repository/   → Handles data persistence (JPA)
- │   │   ├─ model/        → Entity classes (User, Todo)
+ │   │   ├─ controller/      → Handles API endpoints
+ │   │   ├─ service/         → Contains business logic
+ │   │   ├─ repository/      → Handles data persistence (JPA)
+ │   │   ├─ DTOs/            → Handles user input and validations
+ │   │   ├─ exceptions/      → Handles exceptions
+ │   │   ├─ configurations/  → To create our own configuarations to override the default one
+ │   │   ├─ model/           → Entity classes (User, Todo)
  │   │   └─ TodoApplication.java → Main class
  │   └─ resources/
  │       └─ application.properties
