@@ -39,7 +39,7 @@ This project demonstrates the use of **Spring Boot**, **Spring Data JPA**, and *
 ### 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/TodoApplicationBySpringBoot.git
+git clone https://github.com/jeevaravichandran/TodoApplicationBySpringBoot.git
 cd TodoApplicationBySpringBoot
 
 2️⃣ Configure the Database
@@ -57,12 +57,6 @@ spring.datasource.password=YOUR_PASSWORD
 
 # Example (PostgreSQL)
 # spring.datasource.url=jdbc:postgresql://localhost:5432/todo_db
-
-# = JPA / Hibernate
-# ===============================
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
-spring.jpa.hibernate.ddl-auto=update
-
 
 3️⃣ Configure JWT Secret
 
@@ -139,14 +133,14 @@ DELETE /users/delete/{id}
 src/
  ├─ main/
  │   ├─ java/com/example/todo/
- │   │   ├─ controller/      → Handles API endpoints
- │   │   ├─ service/         → Contains business logic
- │   │   ├─ repository/      → Handles data persistence (JPA)
- │   │   ├─ DTOs/            → Handles user input and validations
- │   │   ├─ exceptions/      → Handles exceptions
- │   │   ├─ configurations/  → To create our own configuarations to override the default one
- │   │   ├─ model/           → Entity classes (User, Todo)
- │   │   └─ TodoApplication.java → Main class
+ │   │   ├─ controller/             → Handles API endpoints
+ │   │   ├─ service/                → Contains business logic
+ │   │   ├─ repository/             → Handles data persistence (JPA)
+ │   │   ├─ DTOs/                   → Handles user input and validations
+ │   │   ├─ exceptions/             → Handles exceptions
+ │   │   ├─ configurations/         → To create our own configuarations to override the default one
+ │   │   ├─ model/                  → Entity classes (User, Todo)
+ │   │   └─ TodoApplication.java    → Main class
  │   └─ resources/
  │       └─ application.properties
  └─ test/
