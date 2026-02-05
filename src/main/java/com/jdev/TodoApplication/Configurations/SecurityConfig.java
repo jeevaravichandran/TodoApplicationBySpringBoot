@@ -2,7 +2,6 @@ package com.jdev.TodoApplication.Configurations;
 
 import com.jdev.TodoApplication.Filters.JwtFilter;
 import com.jdev.TodoApplication.Services.CustomUserDetailsServices;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,11 +20,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private CustomUserDetailsServices customUserDetailsServices;
+    private final CustomUserDetailsServices customUserDetailsServices;
+    private final JwtFilter jwtFilter;
 
-    @Autowired
-    private JwtFilter jwtFilter;
+    public SecurityConfig(CustomUserDetailsServices customUserDetailsServices, JwtFilter jwtFilter){
+        this.customUserDetailsServices = customUserDetailsServices;
+        this.jwtFilter = jwtFilter;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

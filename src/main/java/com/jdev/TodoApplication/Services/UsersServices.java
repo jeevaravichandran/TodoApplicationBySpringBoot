@@ -6,7 +6,6 @@ import com.jdev.TodoApplication.DTOs.UserRequest;
 import com.jdev.TodoApplication.Models.Users;
 import com.jdev.TodoApplication.Repostories.UsersRepo;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,17 +19,19 @@ import java.util.List;
 
 @Service
 public class UsersServices {
-    @Autowired
-    private UsersRepo usersRepo;
+    private final UsersRepo usersRepo;
+    private final JWTServices jwtServices;
+    private final AuthenticationManager authenticationManager;
+    private final TodoServices todoServices;
 
-    @Autowired
-    private JWTServices jwtServices;
-
-    @Autowired
-     private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private TodoServices todoServices;
+    public UsersServices(UsersRepo usersRepo, JWTServices jwtServices,
+                         AuthenticationManager authenticationManager,
+                         TodoServices todoServices){
+        this.usersRepo = usersRepo;
+        this.jwtServices = jwtServices;
+        this.authenticationManager = authenticationManager;
+        this.todoServices = todoServices;
+    }
 
     BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 

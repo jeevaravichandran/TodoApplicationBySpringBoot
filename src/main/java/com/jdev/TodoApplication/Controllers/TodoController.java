@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +21,10 @@ import java.util.List;
 @RequestMapping("/todo")
 public class TodoController {
 
-    @Autowired
-    private TodoServices todoServices;
+    private final TodoServices todoServices;
+    public TodoController(TodoServices todoServices){
+        this.todoServices = todoServices;
+    }
 
     @GetMapping
     public ResponseEntity<String> greet(HttpServletRequest request){

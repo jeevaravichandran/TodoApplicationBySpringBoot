@@ -4,7 +4,6 @@ import com.jdev.TodoApplication.DTOs.TodoRequest;
 import com.jdev.TodoApplication.DTOs.UpdateTodoRequest;
 import com.jdev.TodoApplication.Models.Todo;
 import com.jdev.TodoApplication.Repostories.TodoRepo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -14,11 +13,11 @@ import java.util.List;
 @Service
 public class TodoServices {
 
-    @Autowired
-    private TodoRepo todoRepo;
+    private final TodoRepo todoRepo;
 
-    @Autowired
-    private JWTServices jwtServices;
+    public TodoServices(TodoRepo todoRepo){
+        this.todoRepo = todoRepo;
+    }
 
     public Todo createTodo(TodoRequest todoRequest){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -44,7 +43,6 @@ public class TodoServices {
         String requestUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         Todo existTodo = getTodoById(updateTodoRequest.getId());
         if(existTodo.getUsername().equals(requestUsername)){
-            existTodo.setName(updateTodoRequest.getName());
             existTodo.setCompleted(updateTodoRequest.getCompleted());
             return todoRepo.save(existTodo);
         }
