@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 public class DeleteUserRequest {
     @NotBlank(message = "Invalid Password")
-    private String password;
+    private String currentPassword;
 }

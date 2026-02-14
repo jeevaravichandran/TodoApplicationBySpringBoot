@@ -4,6 +4,7 @@ import com.jdev.TodoApplication.DTOs.TodoRequest;
 import com.jdev.TodoApplication.DTOs.UpdateTodoRequest;
 import com.jdev.TodoApplication.Models.Todo;
 import com.jdev.TodoApplication.Repostories.TodoRepo;
+import com.jdev.TodoApplication.TypeConversion.DtoIntoEntity;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -20,12 +21,8 @@ public class TodoServices {
     }
 
     public Todo createTodo(TodoRequest todoRequest){
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Todo todo = new Todo();
-        todo.setName(todoRequest.getName());
-        todo.setCompleted(todoRequest.getCompleted());
-        todo.setUsername(username);
-        return todoRepo.save(todo);
+        Todo newTodo = DtoIntoEntity.todoRequestIntoTodo(todoRequest);
+        return todoRepo.save(newTodo);
     }
 
 
@@ -34,12 +31,7 @@ public class TodoServices {
         return todoRepo.findByUsername(username);
     }
 
-    public List<Todo> findAllTodos() {
-        return todoRepo.findAll();
-    }
-
-
-    public Todo updateTodo(UpdateTodoRequest updateTodoRequest) throws RuntimeException{
+    public Todo updateTodo(UpdateTodoRequest updateTodoRequest){
         String requestUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         Todo existTodo = getTodoById(updateTodoRequest.getId());
         if(existTodo.getUsername().equals(requestUsername)){
@@ -47,7 +39,7 @@ public class TodoServices {
             return todoRepo.save(existTodo);
         }
         else{
-            throw new RuntimeException("Invalid Todo Id , Please Check the Id");
+            throw new RuntimeException("Not Found");
         }
     }
 
@@ -63,10 +55,10 @@ public class TodoServices {
                todoRepo.deleteById(id);
            }
            else{
-               throw new EmptyResultDataAccessException(0);
+               throw new RuntimeException("Not Found");
            }
        } catch (Exception exception){
-           throw new EmptyResultDataAccessException(0);
+           throw new RuntimeException("Not Found");
        }
     }
 
@@ -76,5 +68,4 @@ public class TodoServices {
             todoRepo.deleteById(todo.getId());
         }
     }
-
 }

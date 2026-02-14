@@ -1,15 +1,18 @@
 package com.jdev.TodoApplication.Services;
 
-import com.jdev.TodoApplication.DTOs.LoginUserRequest;
-import com.jdev.TodoApplication.DTOs.UpdateUserRequest;
-import com.jdev.TodoApplication.DTOs.UserRequest;
+import com.jdev.TodoApplication.DTOs.DeleteUserRequest;
+import com.jdev.TodoApplication.DTOs.UserLoginRequest;
+import com.jdev.TodoApplication.DTOs.UpdateEmailRequest;
+import com.jdev.TodoApplication.DTOs.UserRegisterRequest;
 import com.jdev.TodoApplication.Models.Users;
 import com.jdev.TodoApplication.Repostories.UsersRepo;
+import com.jdev.TodoApplication.TypeConversion.DtoIntoEntity;
 import jakarta.validation.Valid;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +26,7 @@ public class UsersServices {
     private final JWTServices jwtServices;
     private final AuthenticationManager authenticationManager;
     private final TodoServices todoServices;
+    private final BCryptPasswordEncoder encoder;
 
     public UsersServices(UsersRepo usersRepo, JWTServices jwtServices,
                          AuthenticationManager authenticationManager,
@@ -31,31 +35,25 @@ public class UsersServices {
         this.jwtServices = jwtServices;
         this.authenticationManager = authenticationManager;
         this.todoServices = todoServices;
+        this.encoder = new BCryptPasswordEncoder(12);
     }
 
-    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
-
-    public Users registerUser(UserRequest request){
-        if(usersRepo.existsByUsername(request.getUsername())){
-            throw new RuntimeException("Username already Exist, Try other name");
+    public Users registerUser(UserRegisterRequest userRegisterRequest){
+        if(usersRepo.existsByUsername(userRegisterRequest.getUsername())){
+            throw new RuntimeException("Username Exists");
         }
-        Users user = new Users();
-        user.setUsername(request.getUsername());
-        user.setPassword(encoder.encode(request.getPassword()));
-        user.setEmail(request.getEmail());
-        user.setName(request.getName());
-        user.setRole("USER");
-        return usersRepo.save(user);
+        Users newUser = DtoIntoEntity.userRegisterRequestIntoUserEntity(userRegisterRequest);
+        newUser.setPassword(encoder.encode(userRegisterRequest.getPassword()));
+        return usersRepo.save(newUser);
     }
 
-    public String verifyUser(LoginUserRequest loginUserRequest) {
+    public String verifyUser(UserLoginRequest userLoginRequest) {
         Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginUserRequest.getUsername(),loginUserRequest.getPassword()));
-
-        if(authentication.isAuthenticated()){
-            return jwtServices.generateToken(loginUserRequest.getUsername()) ;
+                .authenticate(new UsernamePasswordAuthenticationToken(userLoginRequest.getUsername(), userLoginRequest.getPassword()));
+        if(authentication.isAuthenticated()) {
+                return jwtServices.generateToken(userLoginRequest.getUsername());
         }
-        return "Invalid Account ! Please Create an account before login!!!";
+        return "User Not Exist!";
     }
 
     public List<Users> getAllUsers() {
@@ -72,17 +70,26 @@ public class UsersServices {
     }
 
     @Transactional
-    public void deleteUser(Integer id) throws RuntimeException {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String role = auth.getAuthorities().iterator().next().getAuthority();
+    public void deleteUser(Integer id, DeleteUserRequest deleteUserRequest) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Users requestedUser = usersRepo.findByUsername(username);
         boolean userExist = usersRepo.existsUserById(id);
-        if(role.equals("ADMIN") && userExist){
-            Users user = getById(id);
-            todoServices.deleteTodoByUsername(user.getUsername());
-            usersRepo.deleteById(id);
+        if(!userExist){
+            throw new UsernameNotFoundException("User Not Exist");
+        }
+        else if(requestedUser.getRole().equals("ADMIN")){
+            if(encoder.matches(deleteUserRequest.getCurrentPassword(), requestedUser.getPassword())){
+                Users user = getById(id);
+                todoServices.deleteTodoByUsername(user.getUsername());
+                usersRepo.deleteById(id);
+            }
+            else{
+                throw new RuntimeException("Wrong Password");
+            }
+
         }
         else {
-            throw new RuntimeException("Invalid Request");
+            throw new UnsupportedOperationException("Admin Can Only access this method");
         }
     }
 
@@ -92,7 +99,7 @@ public class UsersServices {
     }
 
     @Transactional
-    public void deleteAccount(String password) throws RuntimeException {
+    public void deleteAccount(String password){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Users user = usersRepo.findByUsername(username);
         if(encoder.matches(password, user.getPassword())){
@@ -104,23 +111,25 @@ public class UsersServices {
         }
     }
 
-    public Users updateUser(@Valid UpdateUserRequest request) {
+    public void updateUserEmail(UpdateEmailRequest updateEmailRequest) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Users user = usersRepo.findByUsername(username);
-        user.setName(request.getName());
-        user.setEmail(request.getEmail());
-        return usersRepo.save(user);
+        Users existUser = usersRepo.findByUsername(username);
+        if(encoder.matches(updateEmailRequest.getCurrentPassword(), existUser.getPassword())){
+            existUser.setEmail(updateEmailRequest.getNewEmail());
+            usersRepo.save(existUser);
+            return;
+        }
+        throw new RuntimeException("Wrong Password");
     }
 
-    public void updatePassword(String oldPassword, String newPassword){
+    public void updatePassword(String newPassword, String currentPassword){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Users user = usersRepo.findByUsername(username);
-        if(encoder.matches(oldPassword, user.getPassword())){
+        if(encoder.matches(currentPassword, user.getPassword())){
             user.setPassword(encoder.encode(newPassword));
             usersRepo.save(user);
+            return;
         }
-        else{
-            throw new RuntimeException("Wrong Password");
-        }
+        throw new RuntimeException("Wrong Password");
     }
 }

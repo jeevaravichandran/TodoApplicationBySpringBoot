@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class LoginUserRequest {
+public class UserLoginRequest {
     @NotBlank(message = "Invalid Username")
     private String username;
     @NotBlank(message = "Invalid Password")

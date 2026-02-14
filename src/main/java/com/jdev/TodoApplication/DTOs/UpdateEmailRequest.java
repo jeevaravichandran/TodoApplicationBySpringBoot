@@ -5,9 +5,10 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class UpdateUserRequest {
-    @NotBlank(message = "Name cannot be null")
-    private String name;
+public class UpdateEmailRequest {
+    @NotBlank
     @Email(message = "Invalid Email")
-    private String email;
+    private String newEmail;
+    @NotBlank(message = "Password cannot be empty")
+    private String currentPassword;
 }
